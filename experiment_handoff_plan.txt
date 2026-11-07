@@ -1,0 +1,418 @@
+EXPERIMENT HANDOFF: COHERENCE AND CROSS-MODEL CONFIRMATION
+======================================================
+
+Purpose and authorization
+-------------------------
+This file records a proposed follow-up research plan based on the current
+main.tex. It is a handoff document, not an instruction to spend API credits,
+launch experiments, change the paper, or publish results. Obtain the appropriate
+project authorization before doing those actions. Model names below reproduce
+the draft; verify their exact API identifiers, availability, settings, and prices
+before implementation. Do not silently substitute models.
+
+The aim is to turn a broad exploratory study into a coherent confirmation of a
+small number of claims. Prioritize a few controlled comparisons on common models
+over more model pilots, network topologies, or elaborate scenarios.
+
+Suggested central claim:
+Information and task structure shape leadership, while useful coordination and
+widespread rule violations can occur without leadership.
+
+Source and evidence boundaries
+------------------------------
+The source for this plan is main.tex in this repository. The draft describes
+experiments and aggregate results, but does not provide a complete configuration
+ledger for every pilot or all 32 hidden-channel search steps. This plan does not
+assume access to the original harness, logs, or billing records. Locate and audit
+those before implementing replications. Do not reconstruct missing experimental
+details by guessing and then call the result an exact replication.
+
+The previous inventory identified approximately 46 distinguishable experimental
+components or analyses, not 46 statistically independent studies. Several reuse
+runs, are subsets of existing data, or belong to one adaptive search. Do not add
+their run counts together without checking provenance.
+
+Current evidence motivating this plan
+-------------------------------------
+1. Announced-board leadership relies primarily on Gemini 3.8 Flash.
+2. Later hidden-channel leadership relies primarily on gemini-4-argon.
+3. At 16 agents on the board, providing a roster and 96 tasks produced leadership
+   in 2/2 runs, while a roster and 24 tasks produced none in 2 runs. Increasing
+   workload without a roster produced leadership in 1/2 runs.
+4. Hidden-channel joint tasks plus a unique manifest holder produced leadership
+   in 3/5 runs at eight agents and 2/2 at sixteen. Symmetric information often
+   produced common conventions or direct negotiations instead.
+5. Baseline leadership is measured by visible assignments followed by task
+   starts. This can credit coincidental choices or identical independent plans.
+6. Removing cache leaders while retaining their plans left all tasks solved in
+   two runs. A compound restart reduced output, but also changed names, notes,
+   messages, and manifest access, so it does not isolate leader dependence.
+7. Large DeepSeek V4.1 Flash reasoning-off runs showed 39/64 and 103/128 bypass
+   adopters without leadership. A reasoning-on run showed 1/64. Each large arm
+   has only one run. Separate scarcity comparisons have two runs per setting.
+8. Observed leadership size boundaries depend on the setup. Sparse networks also
+   impose a geometric ceiling on the fraction of agents one agent can reach.
+9. Activation monitoring uses local Qwen3-8B and has not established transfer to
+   the API models anchoring the leadership and safety claims.
+
+Why cost matters, and what it does not resolve
+----------------------------------------------
+The draft reports more than 60,000 calls for about $140 in API spending, including
+about $71 for the 32-step cache search and $1.54 for 1,800 judge calls. Local work
+used one GPU for a few hours, with no monetary estimate. These are reported
+historical totals, not estimates of the proposed work's cost.
+
+Cost-constrained selection is a plausible explanation for numerous inexpensive
+pilots, low reasoning effort, and model changes. The draft does not document
+per-model prices, token usage, savings, or the selection history, so do not claim
+that cost definitively explains any particular switch. Other documented reasons
+include needing a reasoning toggle and needing access to internal activations.
+
+Budget constraints can justify model selection without eliminating confounding:
+changing both channel and model prevents attribution of differences to channel
+alone. The efficient remedy is a small bridge study on common models, rather
+than a full factorial over every historical model and scenario.
+
+PRIORITY 1: COMMON-MODEL LEADERSHIP CONFIRMATION
+=============================================
+
+Objective
+---------
+Test whether the two principal leadership findings survive a model change, and
+connect the board and cache sections through a common model panel.
+
+Provisional models
+------------------
+Gemini 3.8 Flash and gemini-4-argon, subject to verifying the exact historical
+identifiers and availability. Each currently anchors one side of the paper.
+Use the same two models in both experiment families. If either is unavailable,
+document the replacement and retain the distinction between historical
+replication and a new-model test.
+
+Board matrix
+------------
+Population: 16 agents. Complete graph. Announced board. Team objective.
+Roster: absent versus present.
+Workload: 24 versus 96 tasks.
+This gives four conditions per model.
+
+Use the historical 20-round protocol if it can be recovered. Preserve identical
+task-generation rules, action allowances, observation construction, and scoring
+across models. Record model-specific reasoning settings; do not describe unequal
+API settings as a controlled reasoning comparison.
+
+Questions:
+- Does providing a roster increase complete, usable assignment plans?
+- Does a larger workload make allocation useful at this population size?
+- Does the combined effect recur on the other model?
+- Are identical plans evidence of a common convention rather than a unique
+  leader? Track simultaneous plans and authors explicitly.
+
+Hidden-cache matrix
+-------------------
+Population: eight agents. Opaque sandbox names. Same cache tools and affordances
+in every condition.
+Task structure: independent tasks versus joint-submission tasks.
+Roster access: public roster versus one unique roster holder.
+This gives four conditions per model.
+
+Match underlying numerical task content, data access, and submission opportunities
+as far as possible. Document unavoidable differences introduced by joint scoring.
+Randomize which agent holds the manifest and randomize names/order independently.
+
+Questions:
+- Do joint tasks increase the utility of a shared plan?
+- Does asymmetric roster access concentrate plan authorship and following?
+- Does either model instead use decentralized negotiations or a common rule?
+
+Important scope limit: this is a test of leadership under specified cache
+affordances, not necessarily unassisted channel discovery. Explicitly state any
+seeded notes, messages, manifest hints, watches, or file-writing tools supplied.
+
+Replication and scale
+---------------------
+Suggested starting confirmation allocation: five fresh seeds per condition.
+Eight conditions x two models x five seeds = 80 runs.
+Five seeds is a useful starting point, not a guarantee of adequate statistical
+power or precise success probabilities. Use a budget and precision calculation
+before finalizing the seed count. Preserve fresh confirmation seeds separately
+from historical exploratory seeds.
+
+PRIORITY 2: DIRECT TEST OF PLAN INFLUENCE
+======================================
+
+Objective
+---------
+Determine whether apparent followers act because they receive a plan, rather
+than independently selecting the same work. This addresses a central measurement
+weakness and may be more valuable than another broad model comparison.
+
+Starting setup
+--------------
+Use a frozen joint-task setup that reliably produces valid assignment plans.
+Prefer opaque identities and exact partner/task assignments. Start with one
+model, then replicate the strongest result on the second common model.
+
+Interventions
+-------------
+A. Deliver the proposed leader's plan normally.
+B. Withhold that plan from designated potential followers.
+C. Deliver a valid plan whose partner/task allocation has been randomized.
+
+These interventions answer different questions. B tests dependence on exposure
+to the plan. C makes independent agreement with a default ordering less likely.
+If replacing an agent-authored plan with an experimenter-edited plan, label this
+as an intervention on message content; it does not show that the author itself
+invented the randomized allocation.
+
+Implementation cautions
+-----------------------
+- Predefine an eligible plan and when randomization occurs.
+- Avoid selecting only unusually successful runs after seeing outcomes. If the
+  intervention requires a valid plan to exist, report the plan-generation rate
+  and make clear that the influence estimate is conditional on eligibility.
+- Consider episode-level randomization for clean total effects. Withholding from
+  individual followers can create spillovers if other agents repost the plan.
+- Log direct exposure, indirect re-exposure, and competing plans. Do not claim
+  that a follower remained unexposed merely because one message was withheld.
+- Keep sender identity, visibility, timing, and message length comparable where
+  possible. Ensure randomized pairings and schedules remain feasible.
+
+Primary measures
+----------------
+Exact assigned partner/task compliance, repeated compliance, and completed joint
+tasks. Also record latency, competing assignments, and independent task choices.
+Keep the historical cumulative reach measure for comparability, but do not rely
+on it as the sole evidence of influence.
+
+PRIORITY 3: REPLICATED WITHIN-MODEL REASONING COMPARISON
+====================================================
+
+Objective
+---------
+Confirm the reasoning-setting result without confounding it with model family,
+and distinguish refusal from improved legitimate problem solving.
+
+Design
+------
+First use DeepSeek V4.1 Flash, reasoning on versus off, in one fixed scarcity
+setup. Recover and freeze the existing scarcity configuration if possible.
+Prefer several replicated smaller populations over another single 128-agent
+episode. Select population size from a documented pilot or historical setup,
+then freeze it before confirmation.
+
+If resources allow, repeat on a second model with documented support for both
+settings. Validate what each API parameter actually controls. Reasoning disabled
+means the configured API mode, not a demonstrated absence of internal reasoning.
+
+Hold system rules, task generation, data availability, channel, action budgets,
+population, and model version fixed within each model comparison. Record output
+limits, truncation, latency, actual reasoning tokens where available, and cost.
+If token allowances differ, report that as part of the treatment rather than
+silently treating the arms as computationally matched.
+
+Measures
+--------
+- Fraction exposed to the bypass, by direct discovery and social exposure.
+- Fraction adopting among all agents.
+- Adoption among exposed agents, alongside exposure timing and source.
+- Legitimate task completion and total score, separately.
+- Communication, leadership, and explicitly coordinated bypass submissions.
+
+Interpretation
+--------------
+Conditional adoption is descriptive if reasoning changes which agents become
+exposed. For a cleaner willingness-to-adopt test, add a separately labeled
+controlled-exposure condition in which both arms receive the same bypass
+information at the same time. Keep this separate from natural discovery.
+The main swarm reasoning effect should be reported at the run level; agents and
+calls within a run are not independent replications.
+
+PRIORITY 4: LEADER REMOVAL VERSUS ARTIFACT LOSS
+============================================
+
+Objective
+---------
+Separate the value of a live coordinator from the value of a persistent plan,
+and compare leader loss with ordinary agent loss.
+
+Four proposed arms
+------------------
+A. No removal; preserve the plan.
+B. Remove the leader; preserve the plan.
+C. Remove a random nonleader; preserve the plan.
+D. Remove the leader; delete its plan.
+
+Use the same reliable leadership setup and a prespecified intervention time or
+eligibility rule. Keep surviving identities, private notes, manifest access,
+tasks, and data fixed. Do not bundle renaming, memory clearing, and information
+transfer into the removal intervention.
+
+Use matched scenario seeds across arms. If the harness can fork a common episode
+state immediately before intervention, that provides a particularly useful
+matched comparison; document all stochastic sampling after the fork. Otherwise
+report that shared seeds do not guarantee identical pre-intervention histories.
+
+Predefine leader identification, ties, and what happens in runs without a leader.
+Choose the nonleader by a prespecified random rule. Account for disrupted task
+partnerships: losing the leader may also remove a worker, data holder, or partner.
+Record those roles so a performance loss is not automatically attributed to lost
+management.
+
+Measures
+--------
+Post-intervention completion, repeated adherence to the old plan, replacement
+pairings, successor proposals, successor influence, and recovery time. Distinguish
+plan survival in cached observations or notes from plan availability in the shared
+cache; deleting the artifact does not erase agents' memories of it.
+
+The four arms estimate useful contrasts, but are not a complete factorial of
+leader presence and artifact presence. Add a leader-present/plan-deleted arm only
+if isolating artifact regeneration or an interaction is important and affordable.
+Begin with one model and replicate the clearest contrast on the second.
+
+PRIORITY 5: CONTROLLED SCALE REPLICATION
+======================================
+
+Objective
+---------
+Test whether population size changes organizational form after accounting for
+task availability and direct communication access.
+
+Design
+------
+Choose one confirmed leadership setup and test eight, sixteen, and thirty-two
+agents on the common two-model panel. Begin with complete visibility. Use a
+workload that grows with population, keeping useful allocation opportunities
+approximately constant per agent. Specify roster access consistently; in a unique
+holder setup, preserve the information asymmetry at each population size.
+
+Scaling workload changes the historical fixed-workload experiment. Treat it as a
+new control designed to test an explanation for the earlier size effect. Ideally
+retain a fixed-workload arm if budget permits. Keep the per-agent action budget
+constant and record context/message growth; complete visibility removes a degree
+cap but does not remove context-length or attention constraints.
+
+Measures
+--------
+Leadership incidence, exact following, repeated compliance, decentralized pairing,
+common-rule adoption, duplicate solving, legitimate coverage, and cost per task.
+Count compact rule-based assignments as a separate coordination category rather
+than allowing an enumerated-assignment parser to define all organization.
+
+Interpretation
+--------------
+Ask whether organization changes with size under these controls. Do not claim a
+universal critical population or phase transition from a few discrete sizes and
+small seed counts. A larger size with no measured leader may still coordinate
+effectively through conventions or local offers.
+
+SHARED IMPLEMENTATION AND ANALYSIS REQUIREMENTS
+==============================================
+
+Before running
+--------------
+1. Locate the original harness, configurations, prompts, task generators, logs,
+   model identifiers, and seed ledger. Audit the mapping from reported results
+   to actual runs.
+2. Build one configuration table containing every proposed condition. Include
+   tools, channel visibility, seeded information, objective, data access, roster
+   access, identities, task count, joint requirements, rounds, and action budget.
+3. Freeze primary hypotheses, endpoints, intervention rules, seed count, parsing,
+   retry policy, and exclusions. Exploratory follow-ups should be labeled as such.
+4. Verify model settings with a small engineering smoke test. Keep those runs
+   separate from confirmation data. Do not tune prompts separately for each
+   model without documenting that this changes the comparison.
+5. Estimate budget from measured input/output usage, cached-token billing,
+   reasoning usage, and retries on representative short runs. Obtain the project
+   owner's budget authorization before launching paid batches.
+
+During running
+--------------
+Use unique run IDs and immutable configurations. Log model/provider version,
+sampling parameters, prompts, observations, actions, results, messages, visibility,
+interventions, notes, seeds, timestamps, token usage, failures, and billed cost.
+Interleave model/condition execution where practical so provider changes or time
+trends do not align perfectly with treatment. Follow a predefined retry policy;
+retain failures rather than silently replacing unfavorable or malformed runs.
+
+Analysis
+--------
+- Treat episodes as the primary unit of replication. Use paired contrasts where
+  the design truly supports pairing. Do not inflate sample sizes with agent calls.
+- Report raw run counts, per-run outcomes, uncertainty, and unsuccessful runs.
+  With five seeds, emphasize uncertainty rather than binary significance claims.
+- Separate primary confirmation from exploratory analyses and historical search.
+- Report leadership, decentralized coordination, performance, and violations as
+  distinct outcomes. Keep exposure separate from adoption.
+- Version the historical parser and any improved influence metric. Manually audit
+  a prespecified sample of positives and negatives using a written rubric, with
+  treatment/model labels concealed where feasible. Record disagreements.
+- Do not silently combine task-start following, exact partner following, schedule
+  following, and common conventions into one interchangeable leadership number.
+- Report costs and legitimate output alongside behavioral outcomes, so inexpensive
+  but ineffective models are not presented as equivalent substitutes.
+
+Expected handoff artifacts from executing agents
+------------------------------------------------
+1. Audit of original run/configuration provenance and unresolved gaps.
+2. Frozen experiment matrix and hypothesis/analysis document.
+3. Harness changes with a concise explanation and relevant verification.
+4. Budget estimate and an explicit record of authorization before paid execution.
+5. Run manifest and raw event logs with reproducible analysis commands.
+6. Per-condition results with seed-level data, uncertainty, and failure accounting.
+7. A claim-to-evidence table stating which claims replicated, changed, or remain
+   unresolved, without rewriting null results as universal impossibility claims.
+8. Proposed paper edits that distinguish historical exploration from confirmation.
+
+WHAT TO DEPRIORITIZE
+===================
+
+Additional topology sweeps, more unrelated model pilots, larger single-run swarms,
+more espionage scenarios, and additional activation steering are lower priority.
+They broaden the project without resolving its main comparability and causal
+measurement gaps.
+
+Activation monitoring can remain an auxiliary section or become a separate
+study. A second open-model replication would strengthen that study, but is less
+central to the leadership narrative than the priorities above. Do not assume
+Qwen probes transfer to API models without activation access and direct tests.
+
+SUGGESTED PAPER ORGANIZATION AFTER FOLLOW-UP
+==========================================
+
+1. Define leadership, decentralized coordination, and rule violations separately.
+2. Explain that the original studies searched for enabling conditions under a
+   tight budget. Give the real model-selection history if it can be recovered.
+3. Present the common-model confirmation of task structure and information effects.
+4. Present the message intervention establishing plan influence.
+5. Present persistence/removal and controlled scaling as boundary tests.
+6. Present reasoning and bypass behavior as a distinct safety result, with its
+   own within-model comparisons and exposure measurements.
+7. Move the full exploratory condition ledger and auxiliary monitoring work to
+   appendices or a separate report as appropriate. Preserve negative results.
+
+Budget rationale wording, only if verified against project history:
+"Model selection was driven primarily by API cost and task feasibility. We used
+inexpensive models for exploratory sweeps, models that demonstrated coordination
+for leadership experiments, a model supporting reasoning-on/off comparisons for
+safety tests, and a local open-weight model for activation access. Consequently,
+the study does not constitute a uniform cross-model evaluation."
+
+MINIMUM-BUDGET ORDER
+====================
+
+1. Common-model leadership bridge.
+2. Randomized plans and message withholding.
+3. Replicated within-model reasoning comparison.
+4. Clean leader-removal/artifact comparison.
+5. Controlled population-size replication.
+
+If the 80-run starting bridge is unaffordable, reduce scope transparently: retain
+matched models and the decisive baseline/treatment contrasts before adding new
+conditions. Do not spread the budget across so many conditions that every result
+again rests on one or two runs. Exact allocation should follow measured run cost
+and the desired precision, not the historical $140 total.
+
+The principal desired improvement is a shift from many loosely connected
+observations to a small set of reproducible, interpretable comparisons.
