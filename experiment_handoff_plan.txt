@@ -137,12 +137,63 @@ recounts beside original counts rather than silently overwriting history.
 The new paper discloses an earlier cache-audience replay bug and corrected
 summaries; verify that all published rows use the intended code version.
 
-Define a common descriptive outcome for the task-structure comparison: the
-fraction of other agents making a correct assigned-task submission after actual
-plan exposure. Add exact joint/partner/schedule outcomes where applicable.
-A majority of temporally matching agents is operational leadership; it is not
-proof that the plan determined their choices. Causal influence is tested in
-Priority 2. Removal selection must use only compliance observed by the fork time,
+Common outcome: plan alignment above chance. A raw count ("fraction of agents
+making a correct assigned-task submission after exposure") saturates and must
+not be the primary outcome. Agents share one queue, and an agent with 75 actions
+can work on roughly half of 48 tasks, so nearly every exposed agent eventually
+touches some assigned task by chance. The paper already shows this: in one
+restart run 11 of 14 agents did all three assigned tasks (about 7% by chance)
+but also about 20 others each, and in the worked episode only 173 of 249
+follower submissions matched assigned tasks. Score alignment against a
+permutation null instead:
+
+- Work events. For recipient i, take its first K task starts (first read of
+  /tasks/Txx) after its actual exposure time to plan p, where K is the size of
+  its assigned set (minimum 3). The fixed window prevents saturation. Use
+  correct submissions as a secondary event type, and for joint tasks also
+  record whether the submission was with the assigned partner.
+- Observed alignment. a_i = share of those K events that are tasks assigned to
+  i by p.
+- Null: permute recipients. Recompute a_i after randomly reassigning the plan's
+  blocks among its recipients, keeping block contents, block sizes, pair
+  structure and schedule rounds fixed. Score the agent's actual work against
+  the shuffled plan; use 1,000 permutations, or every permutation when there are
+  few. This null keeps natural task ordering: an agent that works upward from
+  T01 by default scores high only when it was actually assigned the low block,
+  which is the case that otherwise credits coincidence. Do not use uniform
+  relabelling of tasks, which assumes agents choose tasks at random and so
+  inflates alignment for default orderings.
+- Single-recipient plans, or plans naming too few recipients to permute: use a
+  block-shift null (circularly shift the assigned block within the task range)
+  and label these results separately.
+- Per-agent result: excess alignment e_i = a_i - mean(null a_i), plus the
+  percentile of a_i in its null distribution. An agent counts as an aligned
+  follower if a_i exceeds the 95th null percentile and at least 2 of its K
+  events are assigned tasks.
+- Run-level outcomes: mean excess alignment over exposed recipients (primary,
+  continuous); the fraction of other agents who are aligned followers; and
+  aligned-follower leadership, meaning at least half of the other agents for
+  one author's plan. Report the historical P and J counts alongside, never as
+  substitutes.
+- Contemporaneous control: score unexposed or not-yet-exposed agents against
+  the same plan over the same rounds; their alignment estimates convention-
+  driven agreement.
+- Limits: if every agent follows the same ID- or name-ordered rule, alignment is
+  high under any null, because agreement with a shared convention cannot be
+  separated from influence observationally. Report such runs as aligned but
+  convention-compatible (flag simultaneous identical plans). Priority 2 resolves
+  this with delivery and replacement interventions.
+- Validation before freezing: run this on historical logs, including runs
+  expected to be positive (q1_trigger_roster 96-task runs, joint_manifest16_argon,
+  the worked episode) and runs expected to be negative (no-plan runs,
+  joint_opaque_argon). Compare its chance levels with the paper's hand-computed
+  "~7% by chance" figure (a different statistic), and report recounts next to the published P/J numbers. Freeze K, the
+  null, the thresholds and the treatment of superseded or conflicting plans
+  before any confirmation run.
+
+Add exact joint/partner/schedule outcomes where applicable. Even
+above-chance alignment by a majority is operational leadership, not proof
+that the plan determined choices. Causal influence is tested in Priority 2. Removal selection must use only compliance observed by the fork time,
 with a frozen eligibility and tie-breaking rule, not eventual episode outcomes.
 
 0b. Episode forking. World state is in-memory Python (src/swarmlab/world.py),
@@ -273,8 +324,11 @@ These avoid direct draw-order coupling; they do not prove statistical independen
 across selected seeds. Check actual balance, and use matched seeds to pair tasks,
 names and holder identity where applicable.
 
-Use the common descriptive compliance outcome in Priority 0a, with joint,
-partner and schedule compliance as secondary outcomes. Also report valid-plan
+Use the permutation-scored alignment outcome in Priority 0a (mean excess
+alignment; aligned-follower leadership) as primary, with joint, partner and
+schedule compliance as secondary outcomes. This matters most in the
+independent-task cells, where raw assigned-task submission rates would be near
+ceiling regardless of any plan. Also report valid-plan
 production and any-author versus holder-led leadership separately. A privileged
 holder is not the only possible plan author.
 
@@ -370,8 +424,10 @@ Implementation cautions
 
 Primary measures
 ----------------
-Exact assigned partner/task compliance, repeated compliance, and completed joint
-tasks. Also record latency, competing assignments, and independent task choices.
+Excess alignment with the original plan (Priority 0a), contrasted across arms
+A/B/C; in arm C also alignment with the replacement plan, which is the most
+direct test that recipients act on message content. Exact assigned partner/task
+compliance, repeated compliance, and completed joint tasks. Also record latency, competing assignments, and independent task choices.
 Keep the historical cumulative reach measure for comparability, but do not rely
 on it as the sole evidence of influence.
 
