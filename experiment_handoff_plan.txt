@@ -1,10 +1,11 @@
-EXPERIMENT HANDOFF: COHERENCE AND CROSS-MODEL CONFIRMATION
+EXPERIMENT HANDOFF: CONFIRMING THE INFORMATION AND ORGANISATION ACCOUNT
 ======================================================
 
 Purpose and authorization
 -------------------------
-This file records a proposed follow-up research plan based on the current
-main.tex. It is a handoff document, not an instruction to spend API credits,
+Updated after review of manuscript commit 9cce342 and the source-code-informed
+plan on 2026-11-07. This file records proposed follow-up research. It is a handoff
+document, not an instruction to spend API credits,
 launch experiments, change the paper, or publish results. Obtain the appropriate
 project authorization before doing those actions. Model names below reproduce
 the draft; verify their exact API identifiers, availability, settings, and prices
@@ -14,14 +15,23 @@ The aim is to turn a broad exploratory study into a coherent confirmation of a
 small number of claims. Prioritize a few controlled comparisons on common models
 over more model pilots, network topologies, or elaborate scenarios.
 
-Suggested central claim:
-Information and task structure shape leadership, while useful coordination and
-widespread rule violations can occur without leadership.
+Current manuscript story:
+Information structures who can organise work; model behaviour shapes adoption
+of violations. Leadership, decentralised coordination, and collective violation
+are distinct outcomes. Treat this as a conditional account to test, not an
+established separation of causes: information also affects exposure, while model
+capability also affects organisation.
+
+The manuscript now has a coherent story table, an experimental-group ledger,
+P/J/S measurement labels, and a worked episode. The follow-up should strengthen
+the evidence behind that story rather than reorganize the paper from scratch.
+Use the manuscript's Q1 (leadership), Q4 (scale), and Q3 (violation) numbering.
 
 Source and evidence boundaries
 ------------------------------
 The source for this plan is main.tex (../swarmhackathonOverleaf), checked against
-the harness in this repository. Locations established during review:
+the harness in this repository. Locations reported by the prior code-review agent (verify on the execution host;
+the latest manuscript review did not independently inspect the external logs):
 - Harness, configs and scripts: this repository (src/swarmlab, configs/,
   scripts/). The copy at /home/linh/swarmTrack2NovHackathon has identical src/,
   configs/ and scripts/.
@@ -30,8 +40,10 @@ the harness in this repository. Locations established during review:
   runs/ is gitignored here, so do not expect logs in this repository.
 - Hidden-channel search ledger: runs/leader_loop.json in the log directory, with
   config, rationale, cap, cost and per-run outcome for each step. It contains 33
-  entries totalling $81.49, whereas the paper reports 32 steps for about $71.
-  Reconcile this before citing either figure.
+  entries. The new manuscript explains $71.49 for steps 1-32 plus $10 for
+  step 33, totalling $81.49; verify this partition against the ledger. It records
+  61 attempts, including four interrupted runs. This is no longer an unexplained
+  discrepancy between the plan and manuscript.
 - Board scenario, incident-replica and reasoning-comparison runs were launched
   from scripts/q1_scenarios.py, not from a YAML config; logs are in
   runs/q1_scenarios/. The script, not configs/, is the config record for those.
@@ -39,10 +51,8 @@ No billing records were found; costs in metrics.json come from per-config price
 constants, not provider invoices (see Priority 0). Do not reconstruct missing
 experimental details by guessing and then call the result an exact replication.
 
-The previous inventory identified approximately 46 distinguishable experimental
-components or analyses, not 46 statistically independent studies. Several reuse
-runs, are subsets of existing data, or belong to one adaptive search. Do not add
-their run counts together without checking provenance.
+Use the new manuscript experimental-group table as the reporting index. Groups
+overlap when analyses reuse runs; do not sum them as independent replications.
 
 Current evidence motivating this plan
 -------------------------------------
@@ -57,8 +67,11 @@ Current evidence motivating this plan
    historical "symmetric" condition (configs/joint_opaque_argon.yaml) had no
    roster at all (cache_manifest: false, manifest_holder: false). The tested
    contrast was no roster versus one holder, not public versus private roster.
-5. Baseline leadership is measured by visible assignments followed by task
-   starts. This can credit coincidental choices or identical independent plans.
+5. The revised paper distinguishes P (visible assignment followed by task start),
+   J (assigned task followed by successful joint completion, not necessarily with
+   the assigned partner), and S (task/round bypass-schedule compliance). The worked
+   episode additionally checks assigned partners. None alone establishes causal
+   influence. Keep these evidence types separate and preserve their provenance.
 6. Removing cache leaders while retaining their plans left all tasks solved in
    two runs. A compound restart reduced output, but also changed names, notes,
    messages, and manifest access, so it does not isolate leader dependence.
@@ -98,26 +111,50 @@ harness does not yet support. Build and freeze these before any confirmation
 batch; otherwise the primary outcomes would again be judged by hand or after
 seeing results.
 
-0a. Strict influence metric. The built-in metric (src/swarmlab/metrics.py)
-counts a follower when a target later reads any assigned task file. Strict
-partner-and-task following exists only as an ad hoc script
-(scripts/joint_leaders.py), and schedule or block plans in cache runs were
-interpreted by hand. Implement, inside metrics.py, a versioned metric that
-records for each plan: author, round, exact assigned (agent, partner, task,
-round) tuples, and whether each target executed them, including repeated
-compliance. Validate it against a written manual rubric on historical runs
-(joint_*_argon, succession*_argon) before freezing. This metric is a primary
-endpoint for the cache matrix and Priorities 2 and 4, and it should also replace
-the parser-based choice of which agent to remove (kill_leader_round currently
-picks the top agent by the task-start parser, which misses schedule plans).
+0a. Versioned assignment-compliance metrics and historical recount.
+Do this before paid confirmation. The built-in task-start metric is not a causal
+influence metric. scripts/joint_leaders.py is also not an exact partner metric:
+it parses task assignments, then counts a target's later correct submission in
+a task/round group with at least two correct agents. It does not explicitly
+check recipient exposure and hard-codes >=2 rather than cfg.joint_tasks. Audit
+and correct those issues before applying J to the four-agent joint condition.
+Do not assume published counts change until the recount is complete.
+
+Preserve reproducible historical P/J/S implementations and add a separately
+versioned compliance metric. For each plan record author, creation time, actual
+recipient exposure time/channel, assigned agents and tasks, and partners/rounds
+where the plan specifies them. Independent-task splits need neither partners
+nor scheduled rounds. Distinguish correct individual submissions, successful
+joint completion, exact partner compliance, exact schedule compliance, repeated
+compliance, and unrelated work. Specify treatment of expired, conflicting,
+withdrawn, superseded, simultaneous, and formula-based plans.
+
+Validate extraction and exposure logic against a written manual rubric on
+historical positive and negative cases (joint_*_argon, succession*_argon).
+Use relevant checks for audience replay, unexposed targets, two- versus four-agent
+requirements, and exact partners. Freeze the metric before confirmation; report
+recounts beside original counts rather than silently overwriting history.
+The new paper discloses an earlier cache-audience replay bug and corrected
+summaries; verify that all published rows use the intended code version.
+
+Define a common descriptive outcome for the task-structure comparison: the
+fraction of other agents making a correct assigned-task submission after actual
+plan exposure. Add exact joint/partner/schedule outcomes where applicable.
+A majority of temporally matching agents is operational leadership; it is not
+proof that the plan determined their choices. Causal influence is tested in
+Priority 2. Removal selection must use only compliance observed by the fork time,
+with a frozen eligibility and tie-breaking rule, not eventual episode outcomes.
 
 0b. Episode forking. World state is in-memory Python (src/swarmlab/world.py),
-so the episode state (world, agent notes, last results, posts, cache, RNG
-states) can be deep-copied at an intervention round and every arm continued
-from the same state. Implement this; it makes Priorities 2 and 4 paired
+but audit the simulator loop before choosing a snapshot mechanism. Capture
+world, agent notes, last results, pending actions/results, queued observations,
+posts, cache, model allocation and RNG states, without sharing mutable objects
+between branches. Implement and validate branch isolation; it makes Priorities 2 and 4 paired
 comparisons rather than seed-matched ones. LLM sampling is not seeded, so arms
 diverge after the fork; that divergence is the treatment effect plus sampling
-noise, and should be estimated by also forking a no-intervention control.
+noise. Include a no-intervention continuation and replicate over independent
+eligible parent episodes; optional duplicate control continuations estimate
+branch variability. Branches from one parent are not independent episodes.
 
 0c. Intervention hooks, none of which exist yet:
 - Withhold a specified post from specified agents (board feed, read_board,
@@ -130,24 +167,26 @@ noise, and should be estimated by also forking a no-intervention control.
   four; see restart_job in world.py).
 - Log every exposure: direct, reposted, or quoted copies of a withheld plan.
 
-0d. Cost and token logging. Cost in metrics.json is computed from price_in /
-price_out constants in each config, not from billed cost, and reasoning tokens
-are not recorded. Request OpenRouter usage accounting and log billed cost,
-reasoning tokens, provider, and finish_reason per call. Update price constants:
-deepseek/deepseek-v4.1-flash now lists at $0.051 / $0.567 per M tokens versus
-$0.045 / $0.50 in the configs, so --max-cost currently stops about 13% too late.
-Gemini 3.8 Flash ($0.825 / $4.125) and gemini-4-argon ($2.00 / $10.00) match
-(checked 2026-11-07; all four historical models are still listed).
+0d. Cost and token logging. metrics.json uses configured price constants rather
+than invoices. Record provider-reported cost and token accounting where available,
+reasoning tokens, caching, provider routing, finish_reason, retries and failures.
+Keep estimated cost separately labeled when billed cost is unavailable. Verify
+prices and supported settings immediately before budgeting; prior price checks
+are not a durable quote. Enforce a conservative spend cap including retries and
+concurrent in-flight calls. Do not infer a precise cap overrun from a price-ratio
+change alone.
 
 0e. Message-capacity logging. Log when content is cut off or hidden: posts
 omitted from the observation feed (board_feed_limit = 15), posts over
 max_post_chars = 600, cache names truncated at cache_name_max = 120, cache file
 content cut at 600 characters, and cache listings beyond the last 40 entries.
-These caps become binding in the 16 to 32 agent range (see Priority 5).
+These caps may bind as populations grow; measure actual omission and truncation
+rates rather than asserting that they explain a boundary (see Priority 5).
 
 0f. Seed policy. The environment seed fixes tasks, data, sandbox names and the
 manifest holder (seed, seed+313, seed+909 in world.py); it does not fix model
-sampling. Historical runs used seeds 0 to 5. Reserve a disjoint block for
+sampling. The prior review reports historical seeds 0 to 5; audit the full manifest
+before assuming that range is exhaustive. Reserve a disjoint block for
 confirmation (for example 100 and above) and record it before running.
 
 PRIORITY 1: COMMON-MODEL LEADERSHIP CONFIRMATION
@@ -182,10 +221,12 @@ controlled reasoning comparison.
 
 Known mismatch to fix: the historical 24-task no-roster cell (or_scaling,
 or_transition) uses the default n_shards = 6, while the trigger configs use
-n_shards = 12. Fix n_shards (12) in all four cells. Roster is
+n_shards = 12. Fix n_shards (12) in all four cells. Label this as a controlled follow-up,
+not an exact reproduction of the six-shard historical baseline. Roster is
 peer_info: roster versus peer_info: same_tasks; keep everything else equal.
-At N = 16 the observation feed shows at most 15 new posts per round, which is
-exactly the number of other agents; record feed truncation (Priority 0e).
+At N = 16 the observation feed shows at most 15 new posts per round, which
+equals the number of other agents, but multiple posts or accumulated unread
+posts can still overflow it; record truncation rather than assuming full delivery.
 
 Questions:
 - Does providing a roster increase complete, usable assignment plans?
@@ -205,38 +246,42 @@ Roster access, three levels:
   (ii)  unique holder: one sandbox can read the manifest (historical,
         configs/joint_manifest_argon.yaml);
   (iii) public: every sandbox can read the manifest (new condition).
-This gives six conditions per model. (i) vs (ii) replicates the historical
-contrast (does supplying the roster to someone create a leader?); (ii) vs (iii)
-is the new asymmetry test (does it matter that only one agent has it?).
+This gives six conditions per model. (i) vs (ii) addresses supplying roster
+information to someone; (ii) vs (iii) isolates exclusivity only if awareness and
+other affordances are controlled. The salience-controlled matrix below is a new
+follow-up. An exact historical prompt replication, if needed, is a separate arm.
 
-Salience confound to remove: in the current harness only the holder is told in
-its system prompt that it can read /cache/manifest.txt (prompts.py, the
-manifest_holder branch); with cache_manifest: true and no holder, no agent is
-told the file exists. In (iii), give every agent the same sentence the holder
-receives (minus "most sandboxes cannot"), so that holder vs public differs in
-access, not in being pointed to the file. Also note that in (ii) non-holders
-who try to read the manifest get "permission denied", which itself signals that
-a roster exists; log these denials as an exposure variable.
+Salience/access control: the current holder receives a system-prompt sentence
+pointing to /cache/manifest.txt; a public manifest does not automatically produce
+the same awareness. In BOTH unique-holder and public conditions, tell ALL agents
+that the same manifest path exists and contains the job roster, using identical
+wording. Let the read result determine who has access; do not tell only the
+holder about the file. Preserve the same directory visibility and tools.
+The none condition can receive a matched sentence stating that no job manifest
+is available. This contrast includes manifest availability; the unique/public
+contrast is the main test of exclusivity. Log permission denials and roster
+republication: public access and eventual public knowledge are different things.
+These assisted conditions test organisation, not unassisted discovery.
 
 Match underlying numerical task content, data access, and submission opportunities
 as far as possible. Task content is already matched for a given seed:
 joint_tasks does not change the task generator's random draws, so the same seed
 gives identical tasks with and without joint scoring. Document unavoidable
 differences introduced by joint scoring (task-file wording, PENDING results).
-The manifest holder and sandbox names are drawn from separate seeded streams
-(seed+313 and seed+909), so they are already independent of each other and of
-the tasks; using the same seeds across conditions pairs holder identity.
+The manifest holder and names use separate RNG streams (seed+313 and seed+909).
+These avoid direct draw-order coupling; they do not prove statistical independence
+across selected seeds. Check actual balance, and use matched seeds to pair tasks,
+names and holder identity where applicable.
 
-Outcome definitions differ by task structure: under joint tasks a plan is a
-pairing/schedule, under independent tasks it is a split. Predefine one common
-primary outcome for both (for example: one author's plan determines at least
-half of the other agents' subsequent task choices under the strict metric of
-Priority 0a) plus condition-specific secondary outcomes.
+Use the common descriptive compliance outcome in Priority 0a, with joint,
+partner and schedule compliance as secondary outcomes. Also report valid-plan
+production and any-author versus holder-led leadership separately. A privileged
+holder is not the only possible plan author.
 
-Model expectation: Gemini 3.8 Flash never produced hidden-channel leadership in
-the cache ladder (Table 3), which is why the search switched to gemini-4-argon.
-Expect a floor for Flash in this matrix. Run it as a capability check with
-fewer seeds (see allocation below) rather than as a full replication arm.
+Earlier Flash cache-ladder failures involved different conditions and do not
+establish a capability floor for this joint-task matrix. Test the same frozen
+matrix on both models with fixed allocations. Do not continue a model only when
+its first runs look promising.
 
 Questions:
 - Do joint tasks increase the utility of a shared plan?
@@ -249,20 +294,24 @@ seeded notes, messages, manifest hints, watches, or file-writing tools supplied.
 
 Replication and scale
 ---------------------
-Suggested starting confirmation allocation (fresh seeds, Priority 0f):
-- Board matrix: 4 conditions x 2 models x 5 seeds = 40 runs.
-- Cache matrix, gemini-4-argon: 6 conditions x 5 seeds = 30 runs.
-- Cache matrix, Gemini 3.8 Flash capability check: 6 conditions x 2 seeds
-  = 12 runs; extend to 5 seeds only if any condition shows leadership.
-Total 82 runs. Rough cost from historical per-call spend (or_scaling: $18.7 for
-14,400 calls, nearly all of it Gemini Flash): about $0.85 per 16-agent Flash
-board run, about 2.4x that for argon, and roughly $1 to $2 per 8-agent argon
-cache run, for a total on the order of $100. This is an extrapolation, not a
-quote; replace it with smoke-test measurements (Priority 0d) before approval.
-Five seeds is a useful starting point, not a guarantee of adequate statistical
-power or precise success probabilities. Use a budget and precision calculation
-before finalizing the seed count. Preserve fresh confirmation seeds separately
-from historical exploratory seeds.
+Suggested fixed starting allocation (fresh seeds, Priority 0f):
+- Board: 4 conditions x 2 models x 5 seeds = 40 runs.
+- Cache: 6 conditions x 2 models x 5 seeds = 60 runs.
+Total: 100 runs, excluding smoke tests and later interventions. Five seeds is a
+starting point, not a power guarantee or a precise estimate of leadership rates.
+Finalize allocation from cost and desired uncertainty before observing outcomes.
+
+If unaffordable, reduce scope symmetrically before running. For example, retain
+the 40-run board matrix and joint-task cache conditions with none/unique/public
+rosters on both models (3 x 2 x 5 = 30), totalling 70. This sacrifices the direct
+independent-versus-joint comparison and must be labeled accordingly. Alternatively
+stage exploratory screening separately from fresh confirmation. Do not use an
+outcome-dependent two-to-five-seed extension as the main cross-model replication.
+
+Estimate spend from representative smoke tests with input/output, reasoning,
+caching, retries and actual round lengths. Historical per-call estimates are
+insufficient for a reliable new-batch budget. Keep confirmation seeds separate
+from engineering pilots and historical search.
 
 PRIORITY 2: DIRECT TEST OF PLAN INFLUENCE
 ======================================
@@ -282,15 +331,23 @@ Natural candidate: the 16-agent manifest-holder setup
 (configs/joint_manifest16_argon.yaml), where the holder led in 2/2 runs.
 
 Requires Priority 0b (forking) and 0c (withholding and content replacement).
-Recommended implementation: run the episode until the first eligible plan is
-posted, fork, and continue arms A, B and C from that identical state. This
-pairs the arms within each episode and removes pre-intervention variation.
+Recommended boundary: generate the first eligible author message, then snapshot
+BEFORE any recipient sees it through feeds, tool results, watches, reads, or
+queued observations. Continue A/B/C from that state. A round-end snapshot after
+recipient delivery is too late. If multiple calls execute in a batch, intercept
+delivery explicitly. Validate the boundary with exposure logs. Distinguish early
+message eligibility from established leadership, which requires later following.
 
 Interventions
 -------------
 A. Deliver the proposed leader's plan normally.
 B. Withhold that plan from designated potential followers.
-C. Deliver a valid plan whose partner/task allocation has been randomized.
+C. Deliver a valid randomized partner/task plan in place of the original.
+Score original-plan and replacement-plan compliance in EVERY branch, including B;
+this provides a baseline for coincidental agreement with either allocation.
+Predefine which recipient population receives each intervention. Whole-episode
+withholding from all peers is cleaner for the primary contrast than selective
+withholding, which can be added as a spillover study.
 
 These interventions answer different questions. B tests dependence on exposure
 to the plan. C makes independent agreement with a default ordering less likely.
@@ -336,7 +393,10 @@ arms "nocot" (reasoning: {enabled: false}, max_tokens 2000) and "ds_think"
 runs/q1_scenarios/.
 Export it to a YAML config and freeze it. The token allowance differs sixfold
 between arms; either equalize max_tokens or report the cap as part of the
-treatment, and log truncation (finish_reason) per call.
+treatment, and log truncation (finish_reason) per call. Equal token ceilings do
+not guarantee equal compute or equal answer-token availability if reasoning
+shares that ceiling. Prefer a documented nonbinding common ceiling for the
+primary setting comparison; treat compute matching as a separate question.
 Prefer several replicated smaller populations over another single 128-agent
 episode. Select population size from a documented pilot or historical setup,
 then freeze it before confirmation.
@@ -373,8 +433,10 @@ PRIORITY 4: LEADER REMOVAL VERSUS ARTIFACT LOSS
 
 Objective
 ---------
-Separate the value of a live coordinator from the value of a persistent plan,
-and compare leader loss with ordinary agent loss.
+Estimate the contribution of continued coordinator participation and shared
+artifact availability, while comparing leader loss with ordinary agent loss.
+Artifact deletion does not erase a previously learned plan, so this is not a
+complete intervention on the existence of the plan in agent memory.
 
 Four proposed arms
 ------------------
@@ -392,10 +454,12 @@ kill_leader_round currently uses. Keep surviving identities, private notes, mani
 tasks, and data fixed. Do not bundle renaming, memory clearing, and information
 transfer into the removal intervention.
 
-Use matched scenario seeds across arms. If the harness can fork a common episode
-state immediately before intervention, that provides a particularly useful
-matched comparison; document all stochastic sampling after the fork. Otherwise
-report that shared seeds do not guarantee identical pre-intervention histories.
+Fork the same established-leadership episode immediately before removal, using
+only evidence available at that time to select the leader. This is later than
+the message-intervention fork, which precedes recipient exposure. Share the
+snapshot machinery across studies, but do not claim they use the same fork
+point. If forking is unavailable, disclose that seed matching does not guarantee
+identical pre-intervention histories.
 
 Predefine leader identification, ties, and what happens in runs without a leader.
 Choose the nonleader by a prespecified random rule. Account for disrupted task
@@ -445,9 +509,13 @@ size effects and must be controlled. In the current harness:
 - max_post_chars = 600: an enumerated assignment for 32+ agents may not fit;
 - cache names are cut at 120 characters, cache file content at 600, and
   ls /cache/tmp shows only the last 40 entries.
-Either scale these limits with N (for example feed limit >= N) or add a
-factorial arm at the largest N with limits raised, and report truncation counts
-from Priority 0e. Without this, a "size threshold" may be an interface limit.
+Measure whether and when each limit actually binds. Prefer a fixed-capacity
+versus raised-capacity contrast at the largest N, retaining a historical-cap
+baseline. Capacity scaling alone changes the environment and cannot identify
+whether the old boundary was due to the interface. Account for multiple posts
+per agent; feed >= N is not by itself a delivery guarantee. Report truncation
+and actual exposure from Priority 0e. Fixed-capacity size effects remain valid
+conditional findings, not intrinsic population thresholds.
 
 Measures
 --------
@@ -473,8 +541,8 @@ Before running
    /home/linh/swarmTrack2NovHackathon/runs/, search ledger in
    runs/leader_loop.json, scenario runs in runs/q1_scenarios/). Recompute
    metrics from events.jsonl with the current code (swarmlab recompute) and
-   reconcile against the paper's tables, including the $71 vs $81.49 search
-   cost discrepancy.
+   reconcile against the new P/J/S tables, replay-bug corrections, and the
+   explained $71.49 + $10 ledger partition. Check interrupted-run exclusions.
 2. Build one configuration table containing every proposed condition. Include
    tools, channel visibility, seeded information, objective, data access, roster
    access, identities, task count, joint requirements, rounds, and action budget.
@@ -505,7 +573,7 @@ Analysis
 - Separate primary confirmation from exploratory analyses and historical search.
 - Report leadership, decentralized coordination, performance, and violations as
   distinct outcomes. Keep exposure separate from adoption.
-- Version the historical parser and any improved influence metric. Manually audit
+- Version the historical parser and improved assignment-compliance metrics. Manually audit
   a prespecified sample of positives and negatives using a written rubric, with
   treatment/model labels concealed where feasible. Record disagreements.
 - Do not silently combine task-start following, exact partner following, schedule
@@ -538,42 +606,46 @@ study. A second open-model replication would strengthen that study, but is less
 central to the leadership narrative than the priorities above. Do not assume
 Qwen probes transfer to API models without activation access and direct tests.
 
-SUGGESTED PAPER ORGANIZATION AFTER FOLLOW-UP
-==========================================
+UPDATES TO THE CURRENT STORY AFTER FOLLOW-UP
+============================================
 
-1. Define leadership, decentralized coordination, and rule violations separately.
-2. Explain that the original studies searched for enabling conditions under a
-   tight budget. Give the real model-selection history if it can be recovered.
-3. Present the common-model confirmation of task structure and information effects.
-4. Present the message intervention establishing plan influence.
-5. Present persistence/removal and controlled scaling as boundary tests.
-6. Present reasoning and bypass behavior as a distinct safety result, with its
-   own within-model comparisons and exposure measurements.
-7. Move the full exploratory condition ledger and auxiliary monitoring work to
-   appendices or a separate report as appropriate. Preserve negative results.
+Retain the new manuscript structure, story table, experimental ledger, P/J/S
+labels and worked episode. Update each claim against a frozen evidence table:
+- Q1: roster availability versus exclusivity, valid-plan generation, actual
+  compliance, causal effects of delivery, and plan persistence.
+- Q4: size effects conditional on workload, capacity and metric coverage.
+- Q3: exposure, model-setting effects, individual adoption and directed violation.
 
-Budget rationale wording, only if verified against project history:
-"Model selection was driven primarily by API cost and task feasibility. We used
-inexpensive models for exploratory sweeps, models that demonstrated coordination
-for leadership experiments, a model supporting reasoning-on/off comparisons for
-safety tests, and a local open-weight model for activation access. Consequently,
-the study does not constitute a uniform cross-model evaluation."
+Replace ambiguous historical "symmetric information" with "no manifest" where
+that is the actual condition. Describe J as assigned-task joint completion,
+not exact partner following. Mark partner-verified cases separately. Keep
+observational mechanism language conditional until interventions support it.
+The running example illustrates plausibility; it does not establish prevalence
+or explain all removal and scale outcomes by itself.
+
+Add interface limits and observed truncation frequencies to scale limitations.
+Distinguish estimated historical API cost from provider-reported expenditure.
+Document cost-driven model selection only where records or project history
+support it. Cost explains practical choices without removing model confounding.
+No broad rewrite or additional experiment inventory is needed now.
 
 MINIMUM-BUDGET ORDER
 ====================
 
-0. Provenance audit, strict influence metric, forking and intervention hooks,
-   billed-cost and truncation logging, seed reservation (no API spend beyond
-   smoke tests).
+0. Provenance and scoring audit, versioned compliance metrics, cost/exposure/
+   truncation logging, seed reservation. Build only the intervention hooks needed
+   for the next approved batch; do not block the observational bridge on completion
+   of every later feature. Smoke tests remain engineering data.
 1. Common-model leadership bridge.
 2. Randomized plans and message withholding.
 3. Replicated within-model reasoning comparison.
 4. Clean leader-removal/artifact comparison.
 5. Controlled population-size replication.
-Steps 2 and 4 share the forking infrastructure and the same frozen setup; they
-can run as one batch from common fork points.
+Steps 2 and 4 can share infrastructure and a frozen setup, but require different
+fork times: before message exposure versus after observed leadership. Treat them
+as distinct experiments and budget their continuations separately.
 
-If the 82-run starting bridge is unaffordable, reduce scope transparently: retain
+If the 100-run full bridge is unaffordable, reduce scope transparently: retain
 matched models and the decisive baseline/treatment contrasts before adding new
 conditions. Do not spread the budget across so many conditions that every result
 again rests on one or two runs. Exact allocation should follow measured run cost
