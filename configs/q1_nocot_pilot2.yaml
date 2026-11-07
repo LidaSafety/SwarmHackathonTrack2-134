@@ -1,0 +1,16 @@
+# Pilot 2: which reasoning-off model still coordinates? N=8 complete, team score, reasoning off.
+base:
+  rounds: 20
+  board: announced
+  peer_info: same_tasks
+  pressure: team
+  n_agents: 8
+  topology: complete
+model_mixes:
+  dsv4pro_nothink: [{name: dsv4pro_nothink, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 2000, extra_body: {reasoning: {enabled: false}}, model: deepseek/deepseek-v4-pro, price_in: 0.955, price_out: 1.911}]
+  ds41flash_nothink: [{name: ds41flash_nothink, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 2000, extra_body: {reasoning: {enabled: false}}, model: deepseek/deepseek-v4.1-flash, price_in: 0.045, price_out: 0.5}]
+  qwen36plus_nothink: [{name: qwen36plus_nothink, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 2000, extra_body: {reasoning: {enabled: false}}, model: qwen/qwen3.6-plus, price_in: 0.325, price_out: 1.95}]
+grid:
+  model_mix: [dsv4pro_nothink, ds41flash_nothink, qwen36plus_nothink]
+  notes_mode: [free, none]
+  seed: [0]

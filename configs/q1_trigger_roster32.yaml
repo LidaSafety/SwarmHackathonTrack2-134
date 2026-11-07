@@ -1,0 +1,31 @@
+# Trigger test 2b: roster at N=32 with 96 tasks.
+base:
+  rounds: 20
+  board: announced
+  peer_info: roster
+  pressure: team
+  topology: complete
+  n_shards: 12
+model_mixes:
+  gemflash:
+  - name: gem38flash
+    backend: openai
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    max_tokens: 12000
+    extra_body:
+      reasoning:
+        effort: low
+    model: google/gemini-3.8-flash
+    price_in: 0.825
+    price_out: 4.125
+grid:
+  model_mix:
+  - gemflash
+  n_tasks:
+  - 96
+  n_agents:
+  - 32
+  seed:
+  - 0
+  - 1

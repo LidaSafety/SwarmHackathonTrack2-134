@@ -1,0 +1,11 @@
+# Free, scripted null-model sweep. Validates the pipeline and gives a baseline.
+base:
+  rounds: 12
+  board: hidden
+model_mixes:
+  mock: [{name: mock, backend: mock}]
+grid:
+  model_mix: [mock]
+  n_agents: [4, 8, 16, 32, 64]
+  topology: [complete, star, ring, small_world, scale_free]
+  seed: [0, 1, 2]

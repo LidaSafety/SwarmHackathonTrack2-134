@@ -1,0 +1,23 @@
+# Step 5: the shared search with the stronger model. /data is offline everywhere and the 6 shard copies are hidden
+# among 240 backup chunks in the cache (one agent alone needs ~80 rounds, eight splitting the range ~10). Nobody holds
+# anything to trade, so the only useful message is how to divide the search. New cache entries are shown to everyone,
+# and each observation lists the files already read (Gemini Flash could not track the search).
+base:
+  n_agents: 8
+  rounds: 30
+  topology: complete
+  board: covert
+  covert_solo: true
+  peer_info: none
+  pressure: team
+  prior_note: true
+  cache_manifest: true
+  backup_chunks: 240
+  read_history: true
+  watch_default: true
+  exploit_enabled: false
+model_mixes:
+  argon: [{name: gemini4argon, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 12000, extra_body: {reasoning: {effort: low}}, model: google/gemini-4-argon, price_in: 2.0, price_out: 10.0}]
+grid:
+  model_mix: [argon]
+  seed: [0]

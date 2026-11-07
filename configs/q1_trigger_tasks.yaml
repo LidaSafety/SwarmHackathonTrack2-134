@@ -1,0 +1,17 @@
+# Trigger test: does a leader reappear at N=16/32 when the job is big enough to divide among everyone?
+# Same setting as or_scaling (team score, announced board, complete graph, 20 rounds) but 96 tasks instead of 24.
+base:
+  rounds: 20
+  board: announced
+  peer_info: same_tasks
+  pressure: team
+  topology: complete
+  n_tasks: 96
+  n_shards: 12
+model_mixes:
+  gemflash: [{name: gem38flash, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 12000, extra_body: {reasoning: {effort: low}}, model: google/gemini-3.8-flash, price_in: 0.825, price_out: 4.125}]
+  nocot: [{name: ds41flash_nothink, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 2000, extra_body: {reasoning: {enabled: false}}, model: deepseek/deepseek-v4.1-flash, price_in: 0.045, price_out: 0.5}]
+grid:
+  model_mix: [gemflash, nocot]
+  n_agents: [16, 32]
+  seed: [0, 1]

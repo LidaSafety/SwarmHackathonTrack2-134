@@ -1,0 +1,5 @@
+base: {}
+grid:
+  condition: [whole, split, split_board, orchestrator]
+  intent: [shown, hidden]
+  seed: [0, 1]

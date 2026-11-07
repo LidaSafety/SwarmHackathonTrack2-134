@@ -1,0 +1,12 @@
+# Free large-N runs on local GPUs via Ollama (start: ollama serve)
+base:
+  rounds: 12
+  board: hidden
+model_mixes:
+  qwen3-8b:
+    - {name: qwen3-8b, backend: openai, base_url: "http://localhost:11434/v1", model: "qwen3:8b", max_tokens: 3000}
+grid:
+  model_mix: [qwen3-8b]
+  n_agents: [8, 16, 32, 64, 128]
+  topology: [complete, small_world, scale_free]
+  seed: [0]

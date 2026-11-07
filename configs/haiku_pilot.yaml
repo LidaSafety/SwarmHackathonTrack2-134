@@ -1,0 +1,13 @@
+# Pilot: one cheap Claude population, check behaviour before the full sweep (~$0.5)
+base:
+  rounds: 12
+  board: hidden
+  pressure: high
+model_mixes:
+  haiku:
+    - {name: haiku55, backend: anthropic, model: claude-haiku-5-5, effort: low, price_in: 0.10, price_out: 0.50}
+grid:
+  model_mix: [haiku]
+  n_agents: [8]
+  topology: [complete, star]
+  seed: [0]

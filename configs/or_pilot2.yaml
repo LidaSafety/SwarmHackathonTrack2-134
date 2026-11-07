@@ -1,0 +1,14 @@
+# Pilot 2: does knowing peers share the same tasks unlock coordination? (~$0.15)
+base:
+  rounds: 12
+  pressure: high
+  n_agents: 8
+  topology: complete
+model_mixes:
+  deepseek:
+    - {name: dsv4flash, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, model: deepseek/deepseek-v4-flash, max_tokens: 8000, extra_body: {reasoning: {effort: low}}, price_in: 0.091, price_out: 0.182}
+grid:
+  model_mix: [deepseek]
+  board: [hinted, announced]
+  peer_info: [none, same_tasks]
+  seed: [0]

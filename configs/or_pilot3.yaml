@@ -1,0 +1,16 @@
+# Pilot 3: which model families coordinate at all, and does the incentive structure matter? (~$0.5)
+base:
+  rounds: 20
+  n_agents: 8
+  topology: complete
+  board: announced
+  peer_info: same_tasks
+model_mixes:
+  deepseek:  [{name: dsv4flash, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 8000, extra_body: {reasoning: {effort: low}}, model: deepseek/deepseek-v4-flash, price_in: 0.091, price_out: 0.182}]
+  qwen:      [{name: qwen37flash, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 8000, extra_body: {reasoning: {effort: low}}, model: qwen/qwen3.7-flash, price_in: 0.03, price_out: 0.13}]
+  gptnano:   [{name: gpt5nano, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 8000, extra_body: {reasoning: {effort: low}}, model: openai/gpt-5-nano, price_in: 0.05, price_out: 0.40}]
+  gemini:    [{name: gem31flashlite, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 8000, extra_body: {reasoning: {effort: low}}, model: google/gemini-3.1-flash-lite, price_in: 0.25, price_out: 1.5}]
+grid:
+  model_mix: [deepseek, qwen, gptnano, gemini]
+  pressure: [high, low, team]
+  seed: [0]

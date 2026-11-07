@@ -1,0 +1,95 @@
+For Claude: eliciting emergent leadership without assigning a leader
+
+Scope
+Treat “without prompt” as no instruction to lead, elect, coordinate, delegate,
+or obey peers; no seeded coordinator message or privileged agent identity.
+Agents still need an objective and tool documentation. A known communication
+channel is a separate experimental treatment from a discovered channel.
+These are proposed hypotheses, not established findings.
+
+What this repository already teaches us
+README.md reports small-N leadership on an announced board with team reward,
+but an answer commons at larger N. report/findings.html, especially the covert
+channel experiments, reports exclusive shard ownership producing request/reply
+protocols rather than leaders. configs/pooled_tasks.yaml already tests blocked
+tasks with complementary data, and configs/shared_goal.yaml tests backup search.
+Do not repeat either as a new idea without checking its saved transcripts.
+
+Priority 1: overlapping responsibility, changing availability
+Give each shard to 2–3 agents rather than exactly one. Make tasks require two
+shards. Now requests have several possible responders, so duplication and
+unanswered work can coexist. Mid-episode, change which agents can read which
+shards, or introduce fresh tasks. Keep changes independent of agent identity.
+Hypothesis: maintaining a current allocation becomes useful enough that an
+agent voluntarily tracks coverage, resolves collisions, and redirects peers.
+Control: the same access and task schedule with static availability. Also test
+exclusive ownership and full access. A commons remains a valid outcome.
+Existing knobs: shard_access, pool_keys, n_shards, n_tasks. Inspect
+world.readable_shards before choosing parameters: greater access must actually
+create overlapping readable sets. Dynamic access/tasks require implementation.
+
+Priority 2: coordination across stages rather than answer broadcasting
+Create a legitimate workload with discovery -> processing -> verification
+dependencies and several eligible agents per stage. Make a downstream stage
+wait for actual upstream artifacts, not a verbal promise. Keep the dependency
+graph in task files, with identical objective wording for all agents.
+Hypothesis: tracking bottlenecks and reallocating idle workers has value that
+one-shot answer sharing lacks. Compare with independent tasks matched for total
+work and solo solvability. Requires a new workload; current scalar lookup tasks
+do not establish this test.
+
+Priority 3: continuity under turnover
+Use arrival_waves, arrival_gap, and lifetime to vary turnover. First compare
+equal lifetimes; then randomize rich_agents as an explicit resource-asymmetry
+treatment. A persistent agent may maintain a useful map of unfinished work
+and orient newcomers without being asked to manage them.
+Do not call a long-lived or better-connected agent a leader merely because
+it posts more. Test whether others change their plans after its messages.
+Compare against equal total agent-round budgets, not just equal wall rounds.
+
+Separate discovery from organisation
+First establish whether a workload yields leadership on an announced board.
+Then hold the workload fixed and test hidden/covert channels. Record discovery
+rate and report both unconditional leadership and leadership conditional on
+discovery. Otherwise failure to find the channel can mask coordination ability.
+For the strict unseeded condition set compromised=0, exploit_enabled=false,
+prior_note=false, cache_seed_msgs="", and peer_info=none. Treat cache_manifest
+and watch_tool as explicit affordance ablations. Do not describe prior notes
+or seeded requests as spontaneous discovery.
+
+Minimal pilot sequence
+Use one already configured capable model, N=8, team reward, complete graph,
+and the same rounds/action budget across comparisons. Start with 5 paired seeds
+for exclusive / overlapping / full access. Inspect trajectories before scaling.
+Then test the most informative contrast with 20 fresh paired seeds, and N=4,
+16 plus one sparse topology. Freeze the selection rule and metric before the
+fresh seeds. Separate exploratory selection from confirmation. Do not launch
+paid sweeps merely to prepare this handoff.
+
+Measurement must distinguish authority from timing
+Current metrics.py counts a visible assignment followed by a later task start.
+That can count work a recipient would have done anyway. Preserve this metric
+for comparison, but add evidence categories: explicit acceptance; revision of
+a previously recorded plan; allocation of previously unclaimed work; repeated
+deference across distinct rounds. Audit directives against pre-message notes
+and prior task reads. Report unique followers, sustained influence, completion,
+duplication, discovery, and coordination cost separately.
+Backup search assignments name chunks rather than Txx tasks, so the existing
+task-directive parser can miss them. Inspect raw messages before concluding
+that such a run has no leadership; extend the parser for the workload if needed.
+
+Causal follow-up
+Save a checkpoint immediately before a naturally occurring allocation post.
+Replay with the post delivered versus withheld, holding state fixed and using
+repeated continuations. This requires checkpoint/replay support. Observational
+compliance alone is not causal influence. Also compare kill_leader_round with
+a random removal matched for activity and resources, plus no removal. A leader
+removal can hurt simply because that agent held scarce data or did useful work.
+Succession and reassignment after removal are stronger evidence of organisation.
+
+Avoid engineering the conclusion
+Do not reward leadership metrics, designate a dispatcher, inject “someone
+should coordinate,” or select only successful transcripts. Change task ecology
+to make allocation useful, then accept leadership, a commons, peer bargaining,
+or failure as possible results. The most informative finding may be the boundary
+where hierarchy becomes useful but agents still choose a decentralised protocol.

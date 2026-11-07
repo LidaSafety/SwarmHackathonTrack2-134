@@ -1,0 +1,16 @@
+# Pilot: does leadership emerge, and when, if the model writes no chain of thought?
+# GPT-5.6 Luna: reasoning low vs reasoning off (no hidden CoT) x private notes vs none (nothing written but actions).
+base:
+  rounds: 20
+  board: announced
+  peer_info: same_tasks
+  pressure: team
+  n_agents: 8
+  topology: complete
+model_mixes:
+  luna_think: [{name: luna_think, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 8000, extra_body: {reasoning: {effort: low}}, model: openai/gpt-5.6-luna, price_in: 0.2, price_out: 1.2}]
+  luna_nothink: [{name: luna_nothink, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 2000, extra_body: {reasoning: {effort: none}}, model: openai/gpt-5.6-luna, price_in: 0.2, price_out: 1.2}]
+grid:
+  model_mix: [luna_think, luna_nothink]
+  notes_mode: [free, none]
+  seed: [0]
