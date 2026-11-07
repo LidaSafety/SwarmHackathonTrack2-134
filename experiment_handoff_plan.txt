@@ -27,6 +27,59 @@ P/J/S measurement labels, and a worked episode. The follow-up should strengthen
 the evidence behind that story rather than reorganize the paper from scratch.
 Use the manuscript's Q1 (leadership), Q4 (scale), and Q3 (violation) numbering.
 
+TWO-DAY EXECUTION SCHEDULE (CURRENT OPERATING PLAN)
+==================================================
+Constraint: one attended working day (day 1), then unattended execution and
+review (day 2). This schedule overrides the full ordering at the end of this
+file. The priorities below remain the complete design; anything not scheduled
+here is deferred and reported as a limitation, not dropped silently.
+
+Key point: runs do not depend on the analysis metric, which is computed offline
+from event logs. Launch runs as soon as configs and logging are ready, and build
+and freeze the metric while they run. Do not inspect confirmation outcomes
+(metrics.json, transcripts) before the metric is frozen, beyond checking that
+runs completed or failed cleanly.
+
+Day 1, morning (about 2-3 h): minimal prerequisites
+- Code: billed-cost and token logging (0d); truncation and omission logging
+  (0e); manifest wording for the cache roster conditions (Priority 1). All three
+  are small changes.
+- Configs: the frozen condition table for Priority 1 (n_shards fixed at 12) and
+  Priority 3, using a fresh seed block (0f), committed before launch.
+- Smoke test: one run per condition on throwaway seeds (outside the
+  confirmation block) to check settings and measure real cost per run.
+- Obtain budget authorization from the smoke-test cost (expected about
+  $110-120 for Priorities 1 and 3 together).
+
+Day 1, midday: launch, resumable, with --max-cost set
+- Priority 1 bridge: 100 runs (about 2-3 h of compute at 6 parallel runs).
+- Priority 3: DeepSeek V4.1 Flash reasoning on/off in the frozen scarcity
+  setup, about 8 seeds per arm (a few dollars).
+- Follow the predefined retry/failure policy; log failures, do not replace them.
+
+Day 1, afternoon: metric (0a)
+- Implement the versioned alignment metric with the permutation null, run it on
+  historical logs, hand-code the blind validation sample, and freeze the code
+  (record the commit hash) before opening Priority 1 or 3 results.
+- Write the analysis script that produces per-run and per-condition tables, so
+  day-2 analysis runs mechanically when sweeps finish.
+
+Day 1, evening (only if time allows): simplified Priority 2
+- Episode-level randomization without forking (see Priority 2, "Simplified
+  day-1 variant"). Smoke-test the online plan detector; if it misses plan
+  formats that appear in the smoke runs, defer Priority 2 instead of launching.
+
+Day 2 (unattended, then review)
+- Priority 2 runs if launched. Frozen analysis scripts run on completed sweeps.
+- People review tables, run the manual audit sample on confirmation runs, fill
+  the claim-to-evidence table, and draft paper edits.
+
+Deferred (state as limitations): episode forking (0b) and the full
+intervention hooks (0c), Priority 4 (leader removal vs artifact loss), and
+Priority 5 (controlled scale). Optional, cheap, no code: a single raised-capacity
+arm at the largest N (board_feed_limit and max_post_chars are already config
+keys), labelled exploratory.
+
 Source and evidence boundaries
 ------------------------------
 The source for this plan is main.tex (../swarmhackathonOverleaf), checked against
@@ -147,49 +200,64 @@ but also about 20 others each, and in the worked episode only 173 of 249
 follower submissions matched assigned tasks. Score alignment against a
 permutation null instead:
 
-- Work events. For recipient i, take its first K task starts (first read of
-  /tasks/Txx) after its actual exposure time to plan p, where K is the size of
-  its assigned set (minimum 3). The fixed window prevents saturation. Use
-  correct submissions as a secondary event type, and for joint tasks also
-  record whether the submission was with the assigned partner.
-- Observed alignment. a_i = share of those K events that are tasks assigned to
-  i by p.
-- Null: permute recipients. Recompute a_i after randomly reassigning the plan's
-  blocks among its recipients, keeping block contents, block sizes, pair
-  structure and schedule rounds fixed. Score the agent's actual work against
-  the shuffled plan; use 1,000 permutations, or every permutation when there are
-  few. This null keeps natural task ordering: an agent that works upward from
-  T01 by default scores high only when it was actually assigned the low block,
-  which is the case that otherwise credits coincidence. Do not use uniform
-  relabelling of tasks, which assumes agents choose tasks at random and so
-  inflates alignment for default orderings.
-- Single-recipient plans, or plans naming too few recipients to permute: use a
-  block-shift null (circularly shift the assigned block within the task range)
-  and label these results separately.
-- Per-agent result: excess alignment e_i = a_i - mean(null a_i), plus the
-  percentile of a_i in its null distribution. An agent counts as an aligned
-  follower if a_i exceeds the 95th null percentile and at least 2 of its K
-  events are assigned tasks.
-- Run-level outcomes: mean excess alignment over exposed recipients (primary,
-  continuous); the fraction of other agents who are aligned followers; and
-  aligned-follower leadership, meaning at least half of the other agents for
-  one author's plan. Report the historical P and J counts alongside, never as
-  substitutes.
+- Work events. For recipient i, take task starts (first read of /tasks/Txx)
+  made after its actual exposure time to plan p. Exclude tasks i had already
+  started before exposure; they are excluded from both the observed score and
+  the null. Keep the first K remaining events, where K is the size of i's
+  assigned set (minimum 3). The fixed window prevents saturation. Recipients
+  with fewer than 3 post-exposure events are "insufficient": they are reported
+  separately and counted as non-followers in the all-agent fraction below
+  (conservative). Use correct submissions as a secondary event type, and for
+  joint tasks also record whether the submission was with the assigned partner.
+- Observed alignment. a_i = share of i's window events that are tasks assigned
+  to i by p.
+- Follower rule (fixed, not a significance test): i is an aligned follower if
+  its own assigned block is the plan block it worked on most in its window
+  (ties go against following) and at least 2 window events fall in that block.
+  A per-agent percentile threshold is not used: with few recipients or few
+  distinct blocks (for example 4 pairs at N = 8), the null has too few distinct
+  values for a 95th-percentile rule to be attainable.
+- Run-level null: permute recipients. Reassign the plan's blocks among its
+  recipients, keeping block contents, block sizes, pair structure and schedule
+  rounds fixed, and recompute mean alignment against the agents' actual work
+  (1,000 permutations, or all of them when fewer). Excess alignment = observed
+  mean minus null mean. This null keeps natural task ordering: an agent that
+  works upward from T01 by default scores high only if it was actually given the
+  low block. Do not use uniform relabelling of tasks, which assumes random task
+  choice and inflates alignment for default orderings. When a plan allows fewer
+  than 20 distinct permutations, report excess alignment as "not testable"
+  rather than as a p-value. Plans naming a single recipient use a block-shift
+  null (circularly shift the block within the task range), labelled separately.
+- Run-level outcomes, defined for EVERY run so that silent and failed
+  plan-generation runs are not dropped:
+  (1) plan production: whether any eligible plan appeared, and its round;
+  (2) primary: aligned-follower fraction = aligned followers of the
+      best-aligned single author's plan / (N - 1), scored 0 in runs with no
+      eligible plan;
+  (3) aligned-follower leadership: (2) >= 0.5;
+  (4) conditional on a plan: mean excess alignment over exposed recipients,
+      labelled as conditional on plan production.
+  Report the historical P and J counts alongside, never as substitutes.
 - Contemporaneous control: score unexposed or not-yet-exposed agents against
-  the same plan over the same rounds; their alignment estimates convention-
-  driven agreement.
-- Limits: if every agent follows the same ID- or name-ordered rule, alignment is
-  high under any null, because agreement with a shared convention cannot be
-  separated from influence observationally. Report such runs as aligned but
-  convention-compatible (flag simultaneous identical plans). Priority 2 resolves
-  this with delivery and replacement interventions.
-- Validation before freezing: run this on historical logs, including runs
-  expected to be positive (q1_trigger_roster 96-task runs, joint_manifest16_argon,
-  the worked episode) and runs expected to be negative (no-plan runs,
-  joint_opaque_argon). Compare its chance levels with the paper's hand-computed
-  "~7% by chance" figure (a different statistic), and report recounts next to the published P/J numbers. Freeze K, the
-  null, the thresholds and the treatment of superseded or conflicting plans
-  before any confirmation run.
+  the same plan over the same rounds, as a descriptive estimate of agreement
+  without exposure.
+- Interpretation: the permutation null is a descriptive benchmark for
+  coincidental agreement, not a causal test. It cannot distinguish a shared
+  convention (for example an ID- or name-ordered rule every agent applies) from
+  influence; such runs can score high under any null. Flag simultaneous
+  identical plans and report those runs as convention-compatible. Only the
+  delivery, withholding and replacement interventions (Priority 2) bear on
+  causal influence.
+- Validation before freezing: validate the EXTRACTION steps, not the
+  conclusions. Hand-code a random sample of historical runs drawn across sweeps
+  (plan identification and parsing, recipient blocks and partners, exposure
+  times, work events), blind to condition where feasible, using a written
+  rubric, and report agreement. Do not treat any historical condition as ground
+  truth for absent or present alignment, and do not tune K, the follower rule or
+  the null to reproduce expected findings. Report recounts next to the published
+  P/J numbers. Freeze the code (commit hash) for K, the follower rule, the null
+  and the handling of superseded or conflicting plans before opening any
+  confirmation results.
 
 Add exact joint/partner/schedule outcomes where applicable. Even
 above-chance alignment by a majority is operational leadership, not proof
@@ -391,6 +459,22 @@ queued observations. Continue A/B/C from that state. A round-end snapshot after
 recipient delivery is too late. If multiple calls execute in a batch, intercept
 delivery explicitly. Validate the boundary with exposure logs. Distinguish early
 message eligibility from established leadership, which requires later following.
+
+Simplified day-1 variant (no forking). Before each episode, a seeded draw
+assigns the episode to arm A, B or C. When the first eligible plan is written
+(post, mkdir or cache write), a hook at creation time applies the arm: A stores
+it normally; B stores it but hides it from all other agents (all read paths:
+feed, read_board, ls, watch, file reads); C stores a randomized valid plan of
+the same structure and similar length in its place, attributed to the same
+author. Episodes with no eligible plan stay in their arm and are reported as
+non-producing (plan-production rate per arm). The arms are unpaired, so they
+need more episodes than forked branches for the same precision; size this from
+the plan-production rate in smoke runs. Risks: the hook must recognize an
+eligible plan at write time, and the existing parser misses some formats
+(schedules, block lists, opaque-name pairings). Smoke-test the detector on
+smoke-run plans and historical plans; if it misses formats that occur, do not
+launch. Authors still remember their own plan and may repost it; log reposts
+and quoted copies as re-exposure.
 
 Interventions
 -------------
@@ -687,6 +771,8 @@ No broad rewrite or additional experiment inventory is needed now.
 
 MINIMUM-BUDGET ORDER
 ====================
+For the current two-day window, follow the TWO-DAY EXECUTION SCHEDULE near the
+top of this file; the ordering below is the full design for later work.
 
 0. Provenance and scoring audit, versioned compliance metrics, cost/exposure/
    truncation logging, seed reservation. Build only the intervention hooks needed
