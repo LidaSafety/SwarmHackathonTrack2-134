@@ -1,6 +1,8 @@
 """Functional leadership (post hoc measurement revision; ../swarmhackathonOverleaf/leadership_reanalysis_handoff.txt).
 
-METRIC_VERSION fl-v1. Frozen (committed) before any aggregate fl-v1 outcome was computed. Confirmation outcomes under
+METRIC_VERSION fl-v1.1. fl-v1 was committed (32672c1) before any aggregate outcome was computed; the manual extraction
+audit of a fixed sample (before aggregation) then found misses, fixed in fl-v1.1 (marked "fl-v1.1" below); still no
+aggregate outcome had been computed. Confirmation outcomes under
 align-v1 had already been seen, so fl-v1 is a post hoc measurement revision, not a preregistered confirmation.
 align-v1 (alignment.py) is unchanged and kept as a sensitivity analysis.
 
@@ -18,6 +20,12 @@ align-v1 (alignment.py) is unchanged and kept as a sensitivity analysis.
    (capital R, so file names like "x_r2.txt" do not count), mapped to tasks as in scripts/schedule_leaders.py; "R9" is
    round index 8. Excluded: self-claims; segments whose tasks all carry answers ("T37=470") and that name no round
    (answer shares); blanket messages ("everyone/all agents/... T01-T48" with no recipient), counted separately.
+   fl-v1.1 additions: (d) a directive segment (let's/please/submit/both/pair/join/sync/we/you take..., or a round
+   mention) with tasks and no peer named, in a message addressed to specific peers ("Hi A14! ...", "A01 to A04: ...",
+   "A05_TO_A02_R7_T07_..."), is an instruction to each addressee, with the author as partner in joint-task runs or
+   when the segment says let's/both/together/with me/pair/join/sync/we; pair lines with a verb ("(A01, A02) do T01-T16",
+   "(A05 + A00) for T33..T48"); blocks without the T ("A01: 1-8"); hyphenated invitations ("A00-pair-A07-R8-T31");
+   a pair line's rounds come from its own clause only; scheduled ranges are expanded.
    Formula/rule language ("sorted", "by id", "in order", "canonical", "alphabetical", "index") is flagged for review;
    only explicit recipient->task text is parsed. Relays: the poster is credited (primary attribution). An instruction
    repeating an earlier different author's (recipient, task set) is flagged relay_candidate; followers that rest only on
@@ -63,13 +71,13 @@ from .alignment import TASK_FILE, _normalise, exposures
 from .metrics import AGENT, PAIR, VERB, expand_tasks, replay_world
 from .world import World, display_names
 
-METRIC_VERSION = "fl-v1"
+METRIC_VERSION = "fl-v1.1"
 
 ROUND = re.compile(r"(?:\bR|\b[Rr]ound[\s_-]*)(\d{1,2})\b")
 TASK_NUM = re.compile(r"\bT(\d{2,3})\b")
 ANSWERED = re.compile(r"\bT(\d{2,3})\s*(?:=|:|\s+ans(?:wer)?\s*=?)\s*-?\d", re.I)
-INVITE = re.compile(r"\b(?:pair(?:ing|s|ed)?(?:\s+up)?|join(?:ing)?|sync(?:ing)?|team(?:ing)?\s+up|partner(?:ing)?)"
-                    r"\s+(?:up\s+)?(?:with\s+)?(A\d{2,3})\b", re.I)
+INVITE = re.compile(r"\b(?:pair(?:ing|s|ed)?(?:[\s-]+up)?|join(?:ing|s)?|sync(?:ing)?|team(?:ing)?[\s-]+up|partner(?:ing)?)"
+                    r"[\s-]+(?:up[\s-]+)?(?:with[\s-]+)?\(?\s*(A\d{2,3})\b", re.I)
 LETS_PAIR = re.compile(r"\b(A\d{2,3})\b[\s,:!]*(?:let'?s|lets|shall we|can we|want to)\s+(?:pair|join|sync|team|submit|do)",
                        re.I)
 WITH = re.compile(r"\bwith\s+(A\d{2,3})\b", re.I)
@@ -77,7 +85,35 @@ BLANKET = re.compile(r"\b(?:everyone|everybody|all agents|all of us|all sandboxe
                      r"all peers)\b", re.I)
 EXTRA_VERB = r"(?:submits?|read(?:s|ing)?|pairs?|syncs?|joins?|sends?|posts?)"  # beyond metrics.VERB
 RULE = re.compile(r"\b(?:sorted|by (?:sandbox |agent )?(?:id|name|index)|in (?:id |name |sorted )?order|alphabetical\w*|"
-                  r"canonical|standard split|index\b|idx\b|ordered by)", re.I)
+                  r"canonical|(?:standard|natural|default) (?:split|partition|allocation|division)|index\b|idx\b|"
+                  r"ordered by|agent i\b|A_?\{?[ik]\}?\b)|T\(\d\s*\*", re.I)
+# fl-v1.1 addressing: "Hi A14!", "A01 to A04:", "A05_TO_A02_R7_..." (the author's own id before "to")
+GREET = re.compile(r"\b(?:hi|hello|hey|dear)\b[\s,]*@?((?:A\d{2,3}[\s,&]*(?:and\s+)?)+)", re.I)
+TO_ADDR = re.compile(r"\b(A\d{2,3})\s+to\s+((?:A\d{2,3}\s*)+)", re.I)
+CUE = re.compile(r"\b(?:let'?s|lets|please|pls|submit|sub|both|together|pair|join|sync|we|you\s+(?:take|do|read|handle|"
+                 r"submit)|can you|could you)\b", re.I)
+JOINT_CUE = re.compile(r"\b(?:let'?s|lets|both|together|with me|pair|join|sync|we)\b", re.I)
+PAIR_VERB = re.compile(r"\(\s*(A\d{2,3})\s*[,+&/]\s*(A\d{2,3})\s*\)\s*(?:do(?:es)?|takes?|handles?|for|works?\s+on|"
+                       r"covers?|gets?|on|:|->|=)?\s*(?=T\d{2})", re.I)
+BARE_BLOCK = re.compile(r"\b(A\d{2,3})\s*[:=]\s*(\d{1,3})\s*(?:-|–|\.\.|to)\s*(\d{1,3})\b")
+
+
+def fl_normalise(msg: str) -> str:
+    """fl-v1.1 extraction additions on top of alignment._normalise (align-v1 itself is unchanged): pair lines with a
+    verb ("(A01, A02) do T01-T16", "(A05 + A00) for T33..T48") and blocks without the T ("A01: 1-8")."""
+    msg = PAIR_VERB.sub(r"(\1,\2) -> ", msg)
+    return BARE_BLOCK.sub(lambda m: f"{m.group(1)}: T{int(m.group(2)):02d}-T{int(m.group(3)):02d}", msg)
+
+
+def _addressees(author: str, msg: str) -> list[str]:
+    out = []
+    g = GREET.search(msg[:160])
+    if g:
+        out += AGENT.findall(g.group(1))
+    for m in TO_ADDR.finditer(msg):
+        if m.group(1).upper() == author:
+            out += AGENT.findall(m.group(2))
+    return [x.upper() for x in dict.fromkeys(out) if x.upper() != author]
 
 
 @dataclass
@@ -96,7 +132,7 @@ class Instruction:
     relay_candidate: bool = False
 
 
-def _schedule(seg: str) -> dict[str, set[int]]:
+def _schedule(seg: str, n_tasks: int = 999) -> dict[str, set[int]]:
     """task -> scheduled round indices. A round mention preceded by in/at/on/during/by/for applies to the tasks between
     it and the previous round mention ("submit T01 in R5"); otherwise to the tasks up to the next round mention
     ("R5: T01, T02"), or to the tasks before it when none follow (as scripts/schedule_leaders.schedules)."""
@@ -105,8 +141,7 @@ def _schedule(seg: str) -> dict[str, set[int]]:
     for i, m in enumerate(marks):
         after = seg[m.end(): marks[i + 1].start() if i + 1 < len(marks) else len(seg)]
         before = seg[marks[i - 1].end() if i else 0: m.start()]
-        tb = [f"T{int(t):02d}" for t in TASK_NUM.findall(before)]
-        ta = [f"T{int(t):02d}" for t in TASK_NUM.findall(after)]
+        tb, ta = expand_tasks(before, n_tasks), expand_tasks(after, n_tasks)  # fl-v1.1: ranges expanded
         # "submit T01 in R5" -> the tasks before; "R5: T01, T02" -> the tasks after
         prefer_before = bool(tb) and bool(re.search(r"\b(?:in|at|on|during|by|for)\s*$", before, re.I))
         tasks = tb if prefer_before else (ta or tb)
@@ -125,15 +160,17 @@ def _marked(rec: str, seg: str) -> bool:
     return bool(re.search(rf"@?\b{rec}\b\s*(?::|->|=|,?\s*(?:please\s+|you\s+)?(?:{VERB}|{EXTRA_VERB})\b)", seg, re.I))
 
 
-def parse_instructions(author: str, msg: str, n_tasks: int, agents: set[str]) -> tuple[list[dict], dict]:
+def parse_instructions(author: str, msg: str, n_tasks: int, agents: set[str], joint: bool = False
+                       ) -> tuple[list[dict], dict]:
     """Instructions in one normalised message: [{recipient, tasks, partners, rounds, via, segment}], plus flags."""
+    msg = fl_normalise(msg)
     out: list[dict] = []
     flags = dict(rule_language=bool(RULE.search(msg)), blanket=False)
 
     def add(rec, tasks, partners, seg, via):
         if rec == author or rec not in agents or not tasks:
             return
-        sched = _schedule(seg)
+        sched = _schedule(seg, n_tasks)
         rounds = {t: frozenset(sched[t]) for t in tasks if t in sched}
         answered = {f"T{int(x):02d}" for x in ANSWERED.findall(seg)}
         if not rounds and set(tasks) <= answered:  # answer share, not an instruction
@@ -141,11 +178,16 @@ def parse_instructions(author: str, msg: str, n_tasks: int, agents: set[str]) ->
         out.append(dict(recipient=rec, tasks=frozenset(tasks), partners=frozenset(p for p in partners if p != rec),
                         rounds=rounds, via=via, segment=seg.strip()[:240]))
 
-    for m in PAIR.finditer(msg):
+    pairs = list(PAIR.finditer(msg))
+    for k, m in enumerate(pairs):
         a, b = m.group(1).upper(), m.group(2).upper()
         tasks = expand_tasks(m.group(3), n_tasks)
-        line_end = msg.find("\n", m.end())
-        seg = msg[m.start(): line_end if line_end != -1 else len(msg)]
+        # fl-v1.1: the pair's own clause only (to the next pair, line end or sentence end), for round mentions
+        ends = [x for x in (msg.find("\n", m.end()), pairs[k + 1].start() if k + 1 < len(pairs) else -1) if x != -1]
+        sent = re.search(r"[.!?;]\s", msg[m.end():])
+        if sent:
+            ends.append(m.end() + sent.start())
+        seg = msg[m.start(): min(ends) if ends else len(msg)]
         if author in (a, b):
             other = b if a == author else a
             add(other, tasks, {author}, seg, "pair")
@@ -153,6 +195,7 @@ def parse_instructions(author: str, msg: str, n_tasks: int, agents: set[str]) ->
             add(a, tasks, {b}, seg, "pair")
             add(b, tasks, {a}, seg, "pair")
     rest = PAIR.sub(" ", msg)
+    addressed = [x for x in _addressees(author, rest) if x in agents]
     for seg in _segments(rest):
         tasks = expand_tasks(seg, n_tasks)
         if not tasks:
@@ -162,6 +205,12 @@ def parse_instructions(author: str, msg: str, n_tasks: int, agents: set[str]) ->
         if not others:
             if BLANKET.search(seg):
                 flags["blanket"] = True
+            elif addressed and (CUE.search(seg) or ROUND.search(seg)):
+                # fl-v1.1: a directive segment in a message addressed to specific peers ("Hi A14! Let's submit T13 in
+                # R7", "A05 TO A02 R7 T07 ..."); the author is the partner for joint work
+                partner = {author} if (joint or JOINT_CUE.search(seg)) else set()
+                for rec in addressed:
+                    add(rec, tasks, partner, seg, "addressed")
             continue
         withp = [x.upper() for x in WITH.findall(seg)]
         inv = [x.upper() for x in INVITE.findall(seg)] + [x.upper() for x in LETS_PAIR.findall(seg)]
@@ -178,6 +227,10 @@ def parse_instructions(author: str, msg: str, n_tasks: int, agents: set[str]) ->
                     add(rec, tasks, {author} | (set(withp) - {rec}), seg, "invite")
         elif len(others) == 1 and withp == others and re.search(r"\bsubmit\b", seg, re.I):
             add(others[0], tasks, {author}, seg, "invite")  # "submit T05 with A07" addressed to that partner
+        elif addressed and set(others) <= set(addressed) and (CUE.search(seg) or ROUND.search(seg)):
+            partner = {author} if (joint or JOINT_CUE.search(seg)) else set()  # fl-v1.1, as (d)
+            for rec in others:
+                add(rec, tasks, partner, seg, "addressed")
     return out, flags
 
 
@@ -193,11 +246,11 @@ def extract(w: World) -> tuple[list[Instruction], list[dict]]:
             continue
         covert = bool(e.get("covert"))
         msg = _normalise(e["message"], names, covert)
-        found, flags = parse_instructions(e["agent"], msg, cfg.n_tasks, agents)
+        found, flags = parse_instructions(e["agent"], msg, cfg.n_tasks, agents, joint=cfg.joint_tasks > 1)
         name_found = set()
         if e.get("file"):
             nm = _normalise(e["file"].rsplit("/", 1)[-1], names, True)
-            nf, _ = parse_instructions(e["agent"], nm, cfg.n_tasks, agents)
+            nf, _ = parse_instructions(e["agent"], nm, cfg.n_tasks, agents, joint=cfg.joint_tasks > 1)
             name_found = {(d["recipient"], d["tasks"]) for d in nf}
         n_tasks_mentioned = len(expand_tasks(msg, cfg.n_tasks))
         messages.append(dict(idx=e["idx"], round=e["round"], author=e["agent"], n_instructions=len(found),

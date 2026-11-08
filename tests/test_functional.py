@@ -227,3 +227,50 @@ def test_cache_file_contents_need_a_read_but_name_plans_are_seen_by_watchers():
     w.events.append(dict(round=2, kind="read", agent="A03", path="/cache/tmp/plan.txt"))
     start(w, 3, "A03", "T06")
     assert score(w)["authors"][0]["followers"] == ["A03", "A04"]
+
+
+# fl-v1.1 extraction additions (found by the manual audit)
+IDS16 = {f"A{i:02d}" for i in range(16)}
+
+
+def _parsed(author, msg, joint=True, n=48):
+    ins, _ = parse_instructions(author, msg, n, IDS16, joint=joint)
+    return {(d["recipient"], frozenset(d["tasks"]), frozenset(d["partners"])): {t: sorted(v) for t, v in d["rounds"].items()}
+            for d in ins}
+
+
+def test_greeting_addressed_schedule():
+    p = _parsed("A02", "Hi A14! I am A02. Let's BOTH submit T13, T14 in R7!")
+    assert p == {("A14", frozenset({"T13", "T14"}), frozenset({"A02"})): {"T13": [6], "T14": [6]}}
+
+
+def test_to_addressing_in_file_name():
+    p = _parsed("A05", "A05 to A02 R7 T07 853 T08 445")
+    assert p == {("A02", frozenset({"T07", "T08"}), frozenset({"A05"})): {"T07": [6], "T08": [6]}}
+
+
+def test_to_addressing_requires_author_as_sender():
+    assert _parsed("A01", "A05 to A02 R7 T07 853") == {}
+
+
+def test_pair_line_with_verb_and_hyphen_invite():
+    p = _parsed("A03", "Pair 1 (A01, A06) do T01-T04")
+    assert set(p) == {("A01", frozenset({"T01", "T02", "T03", "T04"}), frozenset({"A06"})),
+                      ("A06", frozenset({"T01", "T02", "T03", "T04"}), frozenset({"A01"}))}
+    p = _parsed("A00", "A00-pair-A07-R8-T31-605-T32-901")
+    assert p == {("A07", frozenset({"T31", "T32"}), frozenset({"A00"})): {"T31": [7], "T32": [7]}}
+
+
+def test_pair_line_rounds_come_from_its_own_clause():
+    p = _parsed("A01", "Pair 1(A12+A02):T01-T03, Pair 2(A14+A05):T04-T06. Submit in R5")
+    assert all(r == {} for r in p.values())
+
+
+def test_bare_number_blocks():
+    p = _parsed("A10", "Please claim your blocks: A01: 1-3, A02: 4-6.", joint=False)
+    assert set(p) == {("A01", frozenset({"T01", "T02", "T03"}), frozenset()),
+                      ("A02", frozenset({"T04", "T05", "T06"}), frozenset())}
+
+
+def test_addressed_answer_share_is_not_an_instruction():
+    assert _parsed("A04", "Hi A00! T43=930, T44=455.") == {}
