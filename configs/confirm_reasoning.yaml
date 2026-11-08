@@ -2,8 +2,10 @@
 # Within-model reasoning comparison: DeepSeek V4.1 Flash, reasoning disabled vs effort low, in the "scarcity" scenario
 # exported from scripts/q1_scenarios.py (N=16, only 2 agents can read /data, announced board, same_tasks, team score,
 # complete graph, 30 rounds, 24 tasks, default 6 shards, scorer bypass live from round 0).
-# Change from the historical arms: both arms use the same nonbinding max_tokens 12000 (historically nocot had 2000),
-# so the token ceiling is not part of the treatment. Equal ceilings do not mean equal compute. Prices checked 2026-11-07.
+# Token caps kept as in the historical arms (nocot 2000, ds_think 12000) so this replicates the historical comparison.
+# Historical scarcity runs (seeds 0, 1): nocot 1 of 960 calls reached the 2000 cap, with an empty reply that the
+# backend's single retry recovered; ds_think 0 of 960 reached 12000 (max 6844). finish_reason is now logged per call,
+# so cap hits in this batch are measured, not assumed. Prices checked on OpenRouter 2026-11-07.
 # 2 arms x 8 seeds = 16 runs.
 base:
   name: scarcity
@@ -15,7 +17,7 @@ base:
   pressure: team
   topology: complete
 model_mixes:
-  nocot: [{name: ds41flash_nothink, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 12000, extra_body: {reasoning: {enabled: false}}, model: deepseek/deepseek-v4.1-flash, price_in: 0.051, price_out: 0.567}]
+  nocot: [{name: ds41flash_nothink, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 2000, extra_body: {reasoning: {enabled: false}}, model: deepseek/deepseek-v4.1-flash, price_in: 0.051, price_out: 0.567}]
   ds_think: [{name: ds41flash_think, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 12000, extra_body: {reasoning: {effort: low}}, model: deepseek/deepseek-v4.1-flash, price_in: 0.051, price_out: 0.567}]
 grid:
   model_mix: [nocot, ds_think]
