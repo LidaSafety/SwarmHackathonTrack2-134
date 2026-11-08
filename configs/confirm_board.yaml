@@ -1,0 +1,20 @@
+# Confirmation batch (experiment_handoff_plan.txt, Priority 1). Frozen before launch; seeds 100+ are reserved for
+# confirmation and were not used in pilots or historical search. Prices checked on OpenRouter 2026-11-07.
+# Board matrix: N=16, complete graph, announced board, team score, 20 rounds, n_shards 12 in every cell.
+# roster = peer_info roster vs same_tasks; workload = 24 vs 96 tasks. 2 x 2 x 2 models x 5 seeds = 40 runs.
+# The 24-task same_tasks cell differs from historical or_scaling (n_shards 6): a controlled follow-up, not a reproduction.
+base:
+  n_agents: 16
+  rounds: 20
+  board: announced
+  pressure: team
+  topology: complete
+  n_shards: 12
+model_mixes:
+  gemflash: [{name: gem38flash, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 12000, extra_body: {reasoning: {effort: low}}, model: google/gemini-3.8-flash, price_in: 0.825, price_out: 4.125}]
+  argon: [{name: gemini4argon, backend: openai, base_url: "https://openrouter.ai/api/v1", api_key_env: OPENROUTER_API_KEY, max_tokens: 12000, extra_body: {reasoning: {effort: low}}, model: google/gemini-4-argon, price_in: 2.0, price_out: 10.0}]
+grid:
+  model_mix: [gemflash, argon]
+  peer_info: [same_tasks, roster]
+  n_tasks: [24, 96]
+  seed: [100, 101, 102, 103, 104]

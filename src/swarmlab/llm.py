@@ -31,6 +31,10 @@ class LLMResult:
         billed_in = self.input_tokens + 0.1 * self.cache_read_tokens
         return (billed_in * spec.price_in + self.output_tokens * spec.price_out) / 1e6
 
+    def budget_cost(self, spec: ModelSpec) -> float:
+        """For the spending cap: the provider's billed cost when reported, never below the price-table estimate."""
+        return max(self.cost(spec), self.extra.get("billed_usd", 0.0))
+
 
 RATE_LIMITED = "rate_limited"
 
@@ -105,6 +109,9 @@ class OpenAICompatBackend(Backend):
             retry = await self._complete(system, user)
             retry.input_tokens += res.input_tokens
             retry.output_tokens += res.output_tokens
+            if "billed_usd" in res.extra:
+                retry.extra["billed_usd"] = retry.extra.get("billed_usd", 0.0) + res.extra["billed_usd"]
+            retry.extra["empty_retry_finish"] = res.extra.get("finish_reason")
             res = retry
         return res
 
@@ -126,11 +133,20 @@ class OpenAICompatBackend(Backend):
             return LLMResult("", error=f"connection: {e}")
         choice = resp.choices[0]
         u = resp.usage
+        extra = {"finish_reason": choice.finish_reason}
+        if u is not None:
+            ux = u.model_extra or {}
+            if ux.get("cost") is not None:  # OpenRouter: billed USD for this call
+                extra["billed_usd"] = float(ux["cost"])
+            details = u.completion_tokens_details
+            if details is not None and getattr(details, "reasoning_tokens", None) is not None:
+                extra["reasoning_tok"] = details.reasoning_tokens
         return LLMResult(
             choice.message.content or "",
             input_tokens=u.prompt_tokens if u else 0,
             output_tokens=u.completion_tokens if u else 0,
             refusal=bool(getattr(choice.message, "refusal", None)) or choice.finish_reason == "content_filter",
+            extra=extra,
         )
 
 

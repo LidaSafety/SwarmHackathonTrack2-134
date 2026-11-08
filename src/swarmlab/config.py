@@ -72,6 +72,8 @@ class RunConfig:
     cache_times: bool = False  # covert: listings and watched entries show the round each entry was created
     no_data: bool = False  # no sandbox can read /data, so no task can be solved the intended way (the incident's impossible targets)
     manifest_holder: bool = False
+    manifest_notice: bool = False  # every agent gets the same sentence about /cache/manifest.txt (or that none exists);
+    #   who can actually read it is left to the read result (salience-matched none/holder/public roster conditions)
     restart_on_removal: bool = False  # kill_leader_round: also restart the job (leader's cache entries deleted, new names, notes lost, manifest moves)
     holder_model: str = ""  # manifest_holder: name of the ModelSpec the holder runs on (default: as allocated)  # covert_solo: only one seeded sandbox can read /cache/manifest.txt (all sandbox names)
     opaque_ids: bool = False  # agents know themselves only by a random sandbox name (sbx-7f3a), so IDs imply no order
@@ -122,7 +124,7 @@ _HASH_OPTIONAL = ("compromised", "compromised_pos", "compromised_mode", "notes_m
                   "lifetime", "rich_agents", "kill_leader_round", "mass_stop_round", "mass_stop_frac", "data_holders",
                   "compromised_model", "espionage_files", "exploit_open_round", "covert_solo",
                   "cache_seed_msgs", "prior_note", "shard_access", "cache_manifest", "backup_chunks", "read_history", "watch_tool",
-                  "pool_keys", "cache_name_max", "team_target", "team_deadline", "watch_default", "sequential", "cache_writes_per_round", "cache_files", "rich_first", "joint_tasks", "opaque_ids", "cache_times", "manifest_holder", "no_data", "holder_model", "restart_on_removal")
+                  "pool_keys", "cache_name_max", "team_target", "team_deadline", "watch_default", "sequential", "cache_writes_per_round", "cache_files", "rich_first", "joint_tasks", "opaque_ids", "cache_times", "manifest_holder", "manifest_notice", "no_data", "holder_model", "restart_on_removal")
 _DEFAULTS = {f.name: f.default for f in fields(RunConfig) if f.name in _HASH_OPTIONAL}
 
 

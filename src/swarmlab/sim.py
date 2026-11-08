@@ -149,7 +149,7 @@ async def run_episode(
             await asyncio.sleep(pause)
             waited, delay, retries = waited + pause, min(delay * 2, 60.0), retries + 1
         res.rl_retries = retries
-        meter.add(res.cost(spec))
+        meter.add(res.budget_cost(spec))
         obj, err = (None, res.error) if res.error else parse_response(res.text)
         if err and not res.error:
             res.error = err
@@ -172,7 +172,7 @@ async def run_episode(
             world.log(
                 "llm", aid, model=spec_of[aid].name, in_tok=res.input_tokens, out_tok=res.output_tokens,
                 cache_read=res.cache_read_tokens, refusal=res.refusal, error=res.error,
-                rl_retries=res.rl_retries,
+                rl_retries=res.rl_retries, est_usd=round(res.cost(spec_of[aid]), 6),
                 raw=res.text[:4000], obs_chars=len(obs), **res.extra,
             )
             if res.refusal:
